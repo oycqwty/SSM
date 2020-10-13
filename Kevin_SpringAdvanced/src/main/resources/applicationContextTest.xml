@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:mvc="http://www.alibaba.com/schema/stat"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.1.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.alibaba.com/schema/stat http://www.alibaba.com/schema/stat.xsd">
+    <!-- 扫描注解，包下的文件都能被扫描 -->
+    <context:component-scan base-package="com.kevin.web"/>
+    <bean id="BeanLifeCycle" class="com.kevin.web.Model.BeanLifeCycle">
+        <property name="username" value="zhouzhou"></property>
+        <property name="age" value="12"></property>
+    </bean>
+    <bean id="beanJsr250" class="com.kevin.web.component.JSR250Component"></bean>
+</beans>

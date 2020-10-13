@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oy.kevin.Dao.UserDao">
+
+    <resultMap id="queryUser" type="User">
+        <id property="uname" column="username"></id>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex" jdbcType="INTEGER" javaType="_boolean"></result>
+    </resultMap>
+
+    <select id="queryUserById" resultMap="queryUser" parameterType="java.lang.String">
+        select * from user1 where username=#{username}
+    </select>
+
+    <insert id="addUser" parameterType="User">
+        insert into USER1(username,age,sex) values (#{uname},#{age},#{sex})
+    </insert>
+
+    <select id="queryUserOrderbyColumn" resultType="User" parameterType="String">
+        <!--select * from user1 order by ${value} desc-->
+        <!--select * from user1 where username like #{value}-->
+        select * from user1 where username like '%${value}%'
+    </select>
+
+    <select id="testHashMapEnterParameter" parameterType="HashMap" resultType="User">
+        select * from user1 where username = #{username}
+    </select>
+    <!--CALLABLE指定为存储过程-->
+    <select id="procedureAndHashMap" statementType="CALLABLE" parameterType="HashMap">
+        {
+        CALL userquery1(
+        #{uid,jdbcType=INTEGER,javaType=int,mode=IN},
+        #{c,jdbcType=INTEGER,javaType=int,mode=OUT}
+        )
+        }
+    </select>
+
+    <!--Hashmap作为返回类型,返回的map,key是sql定义的别名-->
+    <select id="HashMapResultParam" resultType="HashMap">
+        select username "un",age "age" from user1
+    </select>
+
+    <select id="hashmapAndresulttypeAsMapping" resultType="User">
+        select username "uname",age from user1
+    </select>
+
+    <select id="foreachToCollectTag" parameterType="User" resultType="User">
+        select username uname,age,sex from user1
+        <where>
+            <if test="uids !=null  and uids.size>0 ">
+                <foreach collection="uids" item="uid" open=" sex in (" close=")" separator=",">
+                    #{uid}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+
+    <select id="foreachToCollectTagWithArray" parameterType="int[]" resultType="User">
+        select username uname,age ,sex from user1
+        <where>
+            <if test="array !=null  and array.length>0 ">
+                <foreach collection="array" item="uid" open=" sex in (" close=")" separator=",">
+                    #{uid}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="foreachToCollectTagWithList" parameterType="list" resultType="User">
+        select username uname,age ,sex from user1
+        <where>
+            <if test="list !=null  and list.size()>0 ">
+                <foreach collection="list" item="uid" open=" sex in (" close=")" separator=",">
+                    #{uid}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="foreachToCollectTagWithObjectArray" parameterType="Object[]" resultType="User">
+        select username uname,age ,sex from user1
+        <where>
+            <if test="array !=null  and array.length>0 ">
+                <foreach collection="array" item="User" open=" username in (" close=")" separator=",">
+                    #{User.uname}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <!--通过业务扩展类实现一对一查询-->
+    <select id="testUserAndEnterprise" resultType="UserAndEnterprise">
+        select t1.*,t2.*
+        from user1 t1 inner join enterprise t2 on t1.usershow=t2.username
+    </select>
+
+
+    <resultMap id="testassciation" type="User">
+        <id property="uname" column="username"></id>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <association property="enterprise" javaType="Enterprise">
+            <id property="usershow" column="usershow"></id>
+            <result property="userinfo" column="usershow"></result>
+        </association>
+    </resultMap>
+    <!---->
+    <select id="enterassociation" resultMap="testassciation">
+        select * from user1 t1 inner join enterprise t2
+        on t1.usershow = t2.username
+    </select>
+
+    <select id="testcollect" resultMap="testcollect" parameterType="int">
+        <!--        select * from student t1 inner join class t2 on t1.classid = t2.classid-->
+        <!--        where t2.classid=#{classid}-->
+        select *
+        from class t1 inner join student t2 on t1.classid=t2.classid
+        where t1.classid = #{classid}
+    </select>
+    <resultMap id="testcollect" type="tClass">
+        <id property="classid" column="classid"></id>
+        <result property="className" column="classname"></result>
+        <collection property="students" ofType="Student">
+            <!--重点这个是主键，本类多条可能只能得到一条数据-->
+            <id property="username" column="username"></id>
+            <result property="age" column="age"></result>
+            <result property="classid" column="classid"></result>
+            <result property="sno" column="sno"></result>
+        </collection>
+    </resultMap>
+
+    <select id="ClassAndStudentLazyload" resultMap="lazyload" parameterType="int">
+        select * from class where classid=#{classid}
+    </select>
+    <resultMap id="lazyload" type="tClass">
+        <id property="className" column="classname"></id>
+        <result property="classid" column="classid"></result>
+        <collection property="students" ofType="Student"
+                    select="com.oy.kevin.Dao.UserDao.lazyStudent" column="classid"></collection>
+    </resultMap>
+</mapper>
+

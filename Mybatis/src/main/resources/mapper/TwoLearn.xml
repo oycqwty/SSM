@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oy.kevin.Dao.TwoLearnDao">
+    <select id="queryUsers" resultType="User" parameterType="string">
+        <!--select * from user where id=${value} or id=${value}-->
+        select * from user1 where username='${uname1}' or username='${uname2}'
+    </select>
+    <select id="queUsersByHashMap" parameterType="hashmap" resultType="User">
+        select * from user1 where username=#{username} or age=#{age}
+    </select>
+
+    <select id="creareProcedureTohasnmap" statementType="CALLABLE" parameterType="hashmap">
+        {
+        call queuserByid5(
+        #{ip,javaType=int,jdbcType=INTEGER,mode=IN},
+        #{op,jdbcType=INTEGER,javaType=int,mode=OUT}
+        )
+        }
+    </select>
+    <resultMap id="ObjParamRmap" type="TwoLearn">
+        <id property="uname" column="username"></id>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+    </resultMap>
+    <!--对象传值，动态sql之where if-->
+    <select id="queryUser1" parameterType="TwoLearn" resultMap="ObjParamRmap">
+        <!--select * from user1 where username=#{uname} or age=#{age}-->
+        select * from user1
+        <where>
+            <if test="uname != null and uname != ''">
+                username=#{uname}
+            </if>
+            <if test="age !=null and age !=''">
+                or age=#{age}
+            </if>
+        </where>
+    </select>
+    <resultMap id="dynamicSqltoForaeach" type="Tuser">
+        <id property="id" column="id"></id>
+        <result property="username" column="username"></result>
+        <result property="eamil" column="email"></result>
+    </resultMap>
+    <select id="dynamicSqltoForeach" resultMap="dynamicSqltoForaeach" parameterType="int[]">
+        select * from user
+        <where>
+            <if test="array != null and array.length !=0">
+                <foreach collection="array" separator="," open="id in (" close=")" item="id">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="dynamicSqltoForeachAslist" resultMap="dynamicSqltoForaeach">
+        select * from user
+        <where>
+            <if test="list != null and list.size() >0 ">
+                <foreach collection="list" open="id in (" close=")" separator="," item="id">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="dynamicSqltoForeachAsObjectArray" resultMap="dynamicSqltoForaeach" parameterType="object[]">
+        select * from user
+        <where>
+            <if test="array != null  and array.length>0">
+                <foreach collection="array" open="username in (" separator="," close=")" item="tuser">
+                    #{tuser.username}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="dynamicSqltoForeachAsObjectPropertyList" resultMap="dynamicSqltoForaeach" parameterType="object">
+        select * from user
+        <where>
+            <if test="mobile != null and mobile.size() != 0">
+                <foreach collection="mobile" open="mobile in (" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <resultMap id="oneToone" type="Tuser">
+        <id property="id" column="id"></id>
+        <result property="username" column="username"></result>
+        <result property="eamil" column="email"></result>
+        <association property="role" javaType="com.oy.kevin.Model.Role" column="role">
+            <result column="role" property="role"></result>
+        </association>
+    </resultMap>
+    <select id="anscationtoObject" resultMap="oneToone">
+        select * from user
+    </select>
+
+    <select id="oneToCollection" resultMap="testassociationAndcollection" parameterType="int">
+        select t1.*,t2.sno,t2.username,t2.age
+        from class t1 inner join student t2 on t1.classid=t2.classid
+        where t1.classid = #{cid}
+    </select>
+
+    <resultMap id="testassociationAndcollection" type="tClass">
+        <id property="classid" column="classid"></id>
+        <result property="className" column="classname"></result>
+        <collection property="students" ofType="Student" javaType="list">
+            <!--重点这个是主键，本类多条可能只能得到一条数据-->
+            <id property="username" column="username"></id>
+            <result property="age" column="age"></result>
+            <result property="classid" column="classid"></result>
+            <result property="sno" column="sno"></result>
+        </collection>
+    </resultMap>
+
+    <select id="lazyloadStudent" resultMap="lazyload">
+        select * from class where classid=1
+    </select>
+
+    <resultMap id="lazyload" type="tClass">
+        <id property="classid" column="classid"></id>
+        <result property="className" column="classname"></result>
+        <collection property="students" ofType="Student" javaType="list"
+                    select="com.oy.kevin.Dao.TwoLearnDao.lazyStudent1" column="classid">
+        </collection>
+    </resultMap>
+
+    <cache></cache>
+    <select id="firstLevelCache" resultMap="oneToone">
+        select * from user where id=1
+    </select>
+</mapper>

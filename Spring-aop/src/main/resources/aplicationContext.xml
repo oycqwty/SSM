@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.1.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!-- 加载properties文件 -->
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:jdbc.properties"/>
+    </bean>
+    <!--配置注解扫描，多个包用逗号隔开-->
+    <context:component-scan base-package="com.kevin.dao,com.kevin.aopannotion"/>
+
+    <bean id="student" class="com.kevin.Model.Student">
+        <property name="username" value="kevin"></property>
+        <property name="age" value="22"></property>
+        <property name="sno" value="1"></property>
+    </bean>
+    <!--    <bean id="constructordi" class="com.kevin.Model.Student" >-->
+    <!--        <constructor-arg name="age" value="1"></constructor-arg>-->
+    <!--        <constructor-arg name="sno" value="1"></constructor-arg>-->
+    <!--        <constructor-arg name="username" value="kevin"></constructor-arg>-->
+    <!--&lt;!&ndash;        <constructor-arg name="username"><null/></constructor-arg>&ndash;&gt;-->
+    <!--    </bean>-->
+    <bean id="collectiondi" class="com.kevin.Model.AllCollection" autowire="byType">
+        <property name="listElement">
+            <list>
+                <value>1</value>
+                <value>2</value>
+            </list>
+        </property>
+        <property name="mapElement">
+            <map>
+                <entry>
+                    <key>
+                        <value>kevin</value>
+                    </key>
+                    <value>靓仔</value>
+                </entry>
+            </map>
+        </property>
+        <!--        <property name="student" ref="student"></property>-->
+    </bean>
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${driver}"></property>
+        <property name="url" value="${url}"></property>
+        <property name="username" value="${username}"></property>
+        <property name="password" value="${password}"></property>
+    </bean>
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <bean id="stuImpl" class="com.kevin.dao.StudentDaoImpl"></bean>
+    <!--    &lt;!&ndash;前置通知&ndash;&gt;-->
+    <!--    <bean id="logbefore" class="com.kevin.aop.LogBefore"></bean>-->
+    <!--    <aop:config>-->
+    <!--        <aop:pointcut id="pointcuttest" expression="execution(public void com.kevin.dao.StudentDaoImpl.T(String))" />-->
+    <!--        <aop:advisor advice-ref="logbefore" pointcut-ref="pointcuttest"/>-->
+    <!--    </aop:config>-->
+
+    <!--    &lt;!&ndash;后置通知&ndash;&gt;-->
+    <!--    <bean id="logafter" class="com.kevin.aop.LogAfter"></bean>-->
+    <!--    <aop:config>-->
+    <!--        <aop:pointcut id="pointcu2" expression="execution(public void com.kevin.dao.StudentDaoImpl.T(String))"/>-->
+    <!--        <aop:advisor advice-ref="logafter" pointcut-ref="pointcu2"></aop:advisor>-->
+    <!--    </aop:config>-->
+
+    <!--    &lt;!&ndash;异常通知&ndash;&gt;-->
+    <!--    <bean id="logthrow" class="com.kevin.aop.LogThrow"></bean>-->
+    <!--    <aop:config>-->
+    <!--        <aop:pointcut id="pointcut3" expression="execution(public void com.kevin-->
+    <!--       .dao.StudentDaoImpl.T(String))"/>-->
+    <!--        <aop:advisor advice-ref="logthrow" pointcut-ref="pointcut3"></aop:advisor>-->
+    <!--    </aop:config>-->
+    <!--    <bean id="logaround" class="com.kevin.aop.LogAround"></bean>-->
+    <!--    <aop:config>-->
+    <!--        <aop:pointcut id="pointcut4" expression="execution(public void com.kevin.dao.StudentDaoImpl.T(String))"/>-->
+    <!--        <aop:advisor advice-ref="logaround" pointcut-ref="pointcut4"></aop:advisor>-->
+    <!--    </aop:config>-->
+
+    <!--    <bean id="logaround" class="com.kevin.aop.LogAround"></bean>-->
+    <!--    <aop:config>-->
+    <!--        <aop:pointcut id="pointcut4" expression="execution(* com.kevin.dao.StudentDaoImpl.*(..))"/>-->
+    <!--        <aop:advisor advice-ref="logaround" pointcut-ref="pointcut4"></aop:advisor>-->
+    <!--    </aop:config>-->
+    <!--开启注解对AOP的支持-->
+    <aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+
+
+    <!--测试Schema配置AOP 切点连接aop增强方法-->
+    <bean id="Business" class="com.kevin.dao.Business"></bean>
+    <bean id="pointcutSchema" class="com.kevin.aopSchema.LogAdviceSchema"></bean>
+    <!--    <aop:config>-->
+    <!--        <aop:pointcut id="BusinessPoint" expression="execution(public void com.kevin.dao.Business.testSchema())"/>-->
+    <!--        <aop:aspect ref="pointcutSchema">-->
+    <!--            <aop:before method="Before" pointcut-ref="BusinessPoint" ></aop:before>-->
+    <!--            <aop:after-returning method="After" pointcut-ref="BusinessPoint"></aop:after-returning>-->
+    <!--        </aop:aspect>-->
+    <!--    </aop:config>-->
+
+    <aop:config>
+        <aop:pointcut id="Business2" expression="execution(public String com.kevin.dao.Business.M())"/>
+        <aop:pointcut id="Business3" expression="execution(public String com.kevin.dao.Business.testAround())"/>
+        <aop:aspect ref="pointcutSchema">
+            <aop:before method="Before" pointcut-ref="Business2"></aop:before>
+            <aop:after-returning method="After" pointcut-ref="Business2" returning="returnValue"></aop:after-returning>
+            <aop:around method="around" pointcut-ref="Business3"></aop:around>
+            <!--            <aop:after-throwing method="" -->
+        </aop:aspect>
+    </aop:config>
+</beans>

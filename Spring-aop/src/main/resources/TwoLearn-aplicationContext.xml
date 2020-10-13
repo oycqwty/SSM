@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.1.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <context:component-scan base-package="com.kevin"></context:component-scan>
+    <!--    <bean id="TwoLearnStuDao" class="com.kevin.dao.TwoLearnStuDao"></bean>-->
+    <!--    <bean id="twolearnBefore" class="com.kevin.aop.TwoLearnBefore"></bean>-->
+    <!--    <bean id="TwoLearnAfterReturnAdivce" class="com.kevin.aop.TwoLearnAfterReturnAdivce"></bean>-->
+    <!--    <bean id="TwoLearnMethodInterceptor" class="com.kevin.aop.TwoLearnMethodInterceptor"></bean>-->
+
+    <!--    <aop:config>-->
+    <!--        <aop:pointcut id="pointcut1" expression="execution(public void testAopBeforeMethod(String,int))"/>-->
+    <!--        <aop:advisor advice-ref="twolearnBefore" pointcut-ref="pointcut1"></aop:advisor>-->
+    <!--    </aop:config>-->
+
+    <!--    <aop:config>-->
+    <!--        <aop:pointcut id="pointcut2" expression="execution(public String testAopAfterReturn(String,int))"/>-->
+    <!--        <aop:advisor advice-ref="TwoLearnAfterReturnAdivce" pointcut-ref="pointcut2"></aop:advisor>-->
+    <!--    </aop:config>-->
+
+    <!--    <aop:config>-->
+    <!--        <aop:pointcut id="pointcut3" expression="execution(public void testAopAround(String,int))"/>-->
+    <!--        <aop:advisor advice-ref="TwoLearnMethodInterceptor" pointcut-ref="pointcut3"></aop:advisor>-->
+    <!--    </aop:config>-->
+
+    <!--    <bean id="TwoLearnThrowadvice" class="com.kevin.aop.TwoLearnThrowadvice"></bean>-->
+    <!--    <aop:config>-->
+    <!--        <aop:pointcut id="pointcut4" expression="execution(public void ex())"/>-->
+    <!--        <aop:advisor advice-ref="TwoLearnThrowadvice" pointcut-ref="pointcut4"></aop:advisor>-->
+    <!--    </aop:config>-->
+
+
+    <!--Schema配置-->
+    <bean id="TwoLearnAopSchema" class="com.kevin.aopSchema.TwoLearnAopSchema"></bean>
+    <aop:config>
+        <aop:pointcut id="testschema"
+                      expression="execution(public void com.kevin.dao.TwoLearnStuDao.testAopBeforeMethod(String,int))"/>
+        <aop:pointcut id="testschema1"
+                      expression="execution(public String com.kevin.dao.TwoLearnStuDao.testAopAround(String,int))"/>
+        <aop:pointcut id="testschema2"
+                      expression="execution(public String com.kevin.dao.TwoLearnStuDao.testAopAfterReturn(String,int))"/>
+        <aop:aspect ref="TwoLearnAopSchema">
+            <aop:before method="before" pointcut-ref="testschema"></aop:before>
+            <aop:after-returning method="aftereturn" pointcut-ref="testschema2" returning="res"></aop:after-returning>
+            <aop:around method="around" pointcut-ref="testschema1"></aop:around>
+        </aop:aspect>
+    </aop:config>
+</beans>
